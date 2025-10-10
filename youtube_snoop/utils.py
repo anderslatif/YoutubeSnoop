@@ -46,18 +46,19 @@ def create_album_path(base_dir: Path, artist: str, year: str, album: str) -> Pat
     return album_dir
 
 
-def create_track_filename(track_number: int, title: str) -> str:
-    """Create filename: {tracknumber}_{title}.flac
+def create_track_filename(track_number: int, title: str, extension: str = 'flac') -> str:
+    """Create filename: {tracknumber}_{title}.{extension}
 
     Args:
         track_number: Track number (will be zero-padded to 2 digits)
         title: Track title
+        extension: File extension (default: flac)
 
     Returns:
         Filename string
     """
     title_safe = sanitize_filename(title)
-    return f"{track_number:02d}_{title_safe}.flac"
+    return f"{track_number:02d}_{title_safe}.{extension}"
 
 
 def move_and_rename(src: Path, dest_dir: Path, new_filename: str) -> Path:

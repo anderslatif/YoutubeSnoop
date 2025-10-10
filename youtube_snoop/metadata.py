@@ -78,17 +78,22 @@ class MetadataManager:
             'year': year
         }
 
-    def prompt_track_info(self, track_number: int, suggestion: str) -> str:
+    def prompt_track_info(self, track_number: int, suggestion: str, auto_accept: bool = True) -> str:
         """Prompt user to confirm/edit track title.
 
         Args:
             track_number: Track number
             suggestion: Suggested track title
+            auto_accept: If True, only prompt if suggestion seems unclear
 
         Returns:
             Confirmed track title
         """
         if not self.interactive:
+            return suggestion
+
+        # Auto-accept if the suggestion looks good (not empty, not just "Track N")
+        if auto_accept and suggestion and not suggestion.startswith('Track '):
             return suggestion
 
         title = questionary.text(

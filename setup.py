@@ -22,7 +22,7 @@ setup(
     install_requires=requirements,
     entry_points={
         'console_scripts': [
-            'youtube-snoop=youtube_snoop.cli:main',
+            'youtubesnoop=youtube_snoop.cli:main',
         ],
     },
     python_requires='>=3.8',

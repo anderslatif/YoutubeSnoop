@@ -11,7 +11,8 @@ from youtube_snoop.utils import create_album_path, create_track_filename, saniti
 
 @click.command()
 @click.argument('url')
-def main(url):
+@click.option('--video', is_flag=True, help='Download as video (mp4) instead of audio (flac)')
+def main(url, video):
     """Download YouTube videos/playlists with metadata tagging.
 
     URL: YouTube video or playlist URL
@@ -19,7 +20,7 @@ def main(url):
     click.echo(f"🎵 YoutubeSnoop - Analyzing URL...")
 
     current_dir = Path.cwd()
-    downloader = YouTubeDownloader(current_dir)
+    downloader = YouTubeDownloader(current_dir, video_mode=video)
     metadata_mgr = MetadataManager(interactive=True)
     parser = MetadataParser()
 
@@ -82,15 +83,17 @@ def process_single_video(info, downloader, metadata_mgr, parser, output_dir):
 
     # Tag and rename
     source_file = downloaded_files[0]
-    final_filename = f"{sanitize_filename(metadata['title'])}.flac"
+    file_ext = downloader.file_ext
+    final_filename = f"{sanitize_filename(metadata['title'])}.{file_ext}"
     final_path = output_dir / final_filename
 
-    # Tag the file
-    metadata_mgr.tag_flac(source_file, {
-        'artist': metadata['artist'],
-        'title': metadata['title'],
-        'date': metadata['year'],
-    })
+    # Tag the file (only for FLAC)
+    if not downloader.video_mode:
+        metadata_mgr.tag_flac(source_file, {
+            'artist': metadata['artist'],
+            'title': metadata['title'],
+            'date': metadata['year'],
+        })
 
     # Move to final location
     source_file.rename(final_path)
@@ -155,18 +158,19 @@ def process_playlist(info, downloader, metadata_mgr, parser, output_dir):
             click.echo(f"⚠️  Failed to download track {idx}", err=True)
             continue
 
-        # Tag the file
+        # Tag the file (only for FLAC)
         source_file = downloaded_files[0]
-        metadata_mgr.tag_flac(source_file, {
-            'artist': album_metadata['artist'],
-            'album': album_metadata['album'],
-            'title': track_title,
-            'tracknumber': idx,
-            'date': album_metadata['year'],
-        })
+        if not downloader.video_mode:
+            metadata_mgr.tag_flac(source_file, {
+                'artist': album_metadata['artist'],
+                'album': album_metadata['album'],
+                'title': track_title,
+                'tracknumber': idx,
+                'date': album_metadata['year'],
+            })
 
         # Rename and move
-        final_filename = create_track_filename(idx, track_title)
+        final_filename = create_track_filename(idx, track_title, downloader.file_ext)
         final_path = album_dir / final_filename
         source_file.rename(final_path)
         click.echo(f"💾 Saved: {final_path.relative_to(output_dir)}")

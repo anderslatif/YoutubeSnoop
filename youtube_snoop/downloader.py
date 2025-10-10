@@ -8,10 +8,12 @@ import yt_dlp
 class YouTubeDownloader:
     """Handles downloading videos/playlists from YouTube."""
 
-    def __init__(self, output_dir: Path):
+    def __init__(self, output_dir: Path, video_mode: bool = False):
         self.output_dir = Path(output_dir)
         self.temp_dir = self.output_dir / '.youtube_snoop_temp'
         self.temp_dir.mkdir(exist_ok=True)
+        self.video_mode = video_mode
+        self.file_ext = 'mp4' if video_mode else 'flac'
 
     def get_info(self, url: str) -> Dict:
         """Extract video/playlist information without downloading.
@@ -48,22 +50,33 @@ class YouTubeDownloader:
         """
         output_template = str(self.temp_dir / f'{video_id}.%(ext)s')
 
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'outtmpl': output_template,
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'flac',
-            }],
-            'quiet': False,
-            'no_warnings': False,
-        }
+        if self.video_mode:
+            # Download video in MP4 format (best quality, widely compatible)
+            ydl_opts = {
+                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+                'outtmpl': output_template,
+                'merge_output_format': 'mp4',
+                'quiet': False,
+                'no_warnings': False,
+            }
+        else:
+            # Download audio only and convert to FLAC
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'outtmpl': output_template,
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'flac',
+                }],
+                'quiet': False,
+                'no_warnings': False,
+            }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        # Find the downloaded FLAC file
-        downloaded_files = list(self.temp_dir.glob(f'{video_id}.flac'))
+        # Find the downloaded file
+        downloaded_files = list(self.temp_dir.glob(f'{video_id}.{self.file_ext}'))
         return downloaded_files
 
     def cleanup(self):
