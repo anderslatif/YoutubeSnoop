@@ -1,0 +1,16 @@
+I want to create an easy command line tool for downloading Youtube videos. It should take a Youtube URL as input and download the video to the current directory. 
+
+The tool (YoutubeSnoop) should be able to download videos, single songs or a playlist. If it's a playlist, it should download all videos in the playlist and create a folder with the album name. 
+
+For songs, or playlists that most likely are albums, it should set the metadata (artist, album, track number, title, year) for each video/song downloaded and save the metadata in the file.
+
+It should always download the highest quality video available.
+
+yt-dlp and pytube exists but I am unsure if it can set metadata.
+I use beet for music management and it requires proper metadata to work well.
+
+I would like a single tool in Python to do all of this. It can do make use of existing libraries like yt-dlp or pytube for downloading, and mutagen for setting metadata.
+
+
+If it's a song the filename should be: {tracknumber}._{title}.flac
+Albums should be nested like this: {artist}/{year} - {albumTitle}
