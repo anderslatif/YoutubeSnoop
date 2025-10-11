@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional, Dict
 import requests
 from mutagen.flac import FLAC, Picture
-import imghdr
+import filetype
 
 
 class CoverArtManager:
@@ -81,9 +81,9 @@ class CoverArtManager:
             output_path.write_bytes(response.content)
 
             # Detect image type and rename if needed
-            img_type = imghdr.what(output_path)
-            if img_type:
-                correct_path = output_path.parent / f"Cover.{img_type}"
+            kind = filetype.guess(output_path)
+            if kind:
+                correct_path = output_path.parent / f"Cover.{kind.extension}"
                 if correct_path != output_path:
                     output_path.rename(correct_path)
 
@@ -125,13 +125,11 @@ class CoverArtManager:
             image_data = cover_image.read_bytes()
 
             # Detect MIME type
-            img_type = imghdr.what(cover_image)
-            mime_types = {
-                'jpeg': 'image/jpeg',
-                'jpg': 'image/jpeg',
-                'png': 'image/png'
-            }
-            mime = mime_types.get(img_type, 'image/jpeg')
+            kind = filetype.guess(cover_image)
+            if kind:
+                mime = kind.mime
+            else:
+                mime = 'image/jpeg'  # Default fallback
 
             # Create Picture object
             picture = Picture()

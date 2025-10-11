@@ -26,6 +26,7 @@ def main(url, video):
     parser = MetadataParser()
     coverart_mgr = CoverArtManager()
 
+    download_path = None
     try:
         # Get video/playlist info
         info = downloader.get_info(url)
@@ -33,10 +34,10 @@ def main(url, video):
 
         if is_playlist:
             click.echo(f"📀 Detected playlist: {info.get('title', 'Unknown')}")
-            process_playlist(info, downloader, metadata_mgr, parser, coverart_mgr, current_dir)
+            download_path = process_playlist(info, downloader, metadata_mgr, parser, coverart_mgr, current_dir)
         else:
             click.echo(f"🎵 Detected single video: {info.get('title', 'Unknown')}")
-            process_single_video(info, downloader, metadata_mgr, parser, current_dir)
+            download_path = process_single_video(info, downloader, metadata_mgr, parser, current_dir)
 
     except Exception as e:
         click.echo(f"❌ Error: {e}", err=True)
@@ -46,8 +47,9 @@ def main(url, video):
 
     click.echo("✅ Download complete!")
 
-    # Run beets for metadata correction
-    run_beets(current_dir)
+    # Run beets for metadata correction on the downloaded file/folder only
+    if download_path:
+        run_beets(download_path)
 
 
 def process_single_video(info, downloader, metadata_mgr, parser, output_dir):
@@ -100,6 +102,8 @@ def process_single_video(info, downloader, metadata_mgr, parser, output_dir):
     # Move to final location
     source_file.rename(final_path)
     click.echo(f"💾 Saved: {final_path}")
+
+    return final_path
 
 
 def process_playlist(info, downloader, metadata_mgr, parser, coverart_mgr, output_dir):
@@ -191,6 +195,8 @@ def process_playlist(info, downloader, metadata_mgr, parser, coverart_mgr, outpu
             album_metadata['album'],
             audio_files
         )
+
+    return album_dir
 
 
 def run_beets(directory):

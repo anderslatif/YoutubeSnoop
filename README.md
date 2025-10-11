@@ -11,7 +11,7 @@ A Youtube downloader of the highest quality
 You can install it via pip:
 
 ```bash
-$ pip install youtube_snoop
+$ pip install youtubesnoop
 ```
 
 ---
