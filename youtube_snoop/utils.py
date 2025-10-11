@@ -47,7 +47,7 @@ def create_album_path(base_dir: Path, artist: str, year: str, album: str) -> Pat
 
 
 def create_track_filename(track_number: int, title: str, extension: str = 'flac') -> str:
-    """Create filename: {tracknumber}_{title}.{extension}
+    """Create filename: {tracknumber}. {title}.{extension}
 
     Args:
         track_number: Track number (will be zero-padded to 2 digits)
