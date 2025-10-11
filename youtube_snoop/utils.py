@@ -58,7 +58,7 @@ def create_track_filename(track_number: int, title: str, extension: str = 'flac'
         Filename string
     """
     title_safe = sanitize_filename(title)
-    return f"{track_number:02d}_{title_safe}.{extension}"
+    return f"{track_number:02d}. {title_safe}.{extension}"
 
 
 def move_and_rename(src: Path, dest_dir: Path, new_filename: str) -> Path:

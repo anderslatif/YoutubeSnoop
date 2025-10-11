@@ -6,6 +6,7 @@ from pathlib import Path
 from youtube_snoop.downloader import YouTubeDownloader
 from youtube_snoop.metadata import MetadataManager
 from youtube_snoop.parser import MetadataParser
+from youtube_snoop.coverart import CoverArtManager
 from youtube_snoop.utils import create_album_path, create_track_filename, sanitize_filename
 
 
@@ -23,6 +24,7 @@ def main(url, video):
     downloader = YouTubeDownloader(current_dir, video_mode=video)
     metadata_mgr = MetadataManager(interactive=True)
     parser = MetadataParser()
+    coverart_mgr = CoverArtManager()
 
     try:
         # Get video/playlist info
@@ -31,7 +33,7 @@ def main(url, video):
 
         if is_playlist:
             click.echo(f"📀 Detected playlist: {info.get('title', 'Unknown')}")
-            process_playlist(info, downloader, metadata_mgr, parser, current_dir)
+            process_playlist(info, downloader, metadata_mgr, parser, coverart_mgr, current_dir)
         else:
             click.echo(f"🎵 Detected single video: {info.get('title', 'Unknown')}")
             process_single_video(info, downloader, metadata_mgr, parser, current_dir)
@@ -100,7 +102,7 @@ def process_single_video(info, downloader, metadata_mgr, parser, output_dir):
     click.echo(f"💾 Saved: {final_path}")
 
 
-def process_playlist(info, downloader, metadata_mgr, parser, output_dir):
+def process_playlist(info, downloader, metadata_mgr, parser, coverart_mgr, output_dir):
     """Process a playlist download."""
     playlist_title = info.get('title', 'Unknown Playlist')
     entries = info.get('entries', [])
@@ -142,6 +144,7 @@ def process_playlist(info, downloader, metadata_mgr, parser, output_dir):
     click.echo(f"\n📁 Album folder: {album_dir.relative_to(output_dir)}")
 
     # Download and process each track
+    audio_files = []
     for idx, entry in enumerate(entries, 1):
         video_title = entry.get('title', f'Track {idx}')
         parsed_track = parser.parse_video_title(video_title)
@@ -175,6 +178,20 @@ def process_playlist(info, downloader, metadata_mgr, parser, output_dir):
         source_file.rename(final_path)
         click.echo(f"💾 Saved: {final_path.relative_to(output_dir)}")
 
+        # Track audio files for cover art embedding
+        if not downloader.video_mode:
+            audio_files.append(final_path)
+
+    # Search and embed cover art for the album (audio only)
+    if not downloader.video_mode and audio_files:
+        click.echo()
+        coverart_mgr.process_album_cover(
+            album_dir,
+            album_metadata['artist'],
+            album_metadata['album'],
+            audio_files
+        )
+
 
 def run_beets(directory):
     """Run beets on the downloaded files for metadata correction."""
@@ -184,8 +201,6 @@ def run_beets(directory):
     try:
         # Run beets import in the directory
         subprocess.run(['beet', 'import', str(directory)], check=False)
-    except FileNotFoundError:
-        click.echo("⚠️  beets not found. Install with: pip install beets")
     except Exception as e:
         click.echo(f"⚠️  Error running beets: {e}")
 
