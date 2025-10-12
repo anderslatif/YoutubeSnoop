@@ -1,7 +1,6 @@
 """CLI interface for YoutubeSnoop."""
 
 import click
-import subprocess
 from pathlib import Path
 from youtube_snoop.downloader import YouTubeDownloader
 from youtube_snoop.metadata import MetadataManager
@@ -47,9 +46,9 @@ def main(url, video):
 
     click.echo("✅ Download complete!")
 
-    # Run beets for metadata correction on the downloaded file/folder only
-    if download_path:
-        run_beets(download_path)
+    # Offer MusicBrainz metadata correction on the downloaded file/folder only
+    if download_path and not video:
+        correct_metadata(download_path, metadata_mgr)
 
 
 def process_single_video(info, downloader, metadata_mgr, parser, output_dir):
@@ -199,16 +198,9 @@ def process_playlist(info, downloader, metadata_mgr, parser, coverart_mgr, outpu
     return album_dir
 
 
-def run_beets(directory):
-    """Run beets on the downloaded files for metadata correction."""
-    click.echo("\n🎼 Running beets for metadata correction...")
-    click.echo("(You can interact with beets now)\n")
-
-    try:
-        # Run beets import in the directory
-        subprocess.run(['beet', 'import', str(directory)], check=False)
-    except Exception as e:
-        click.echo(f"⚠️  Error running beets: {e}")
+def correct_metadata(path, metadata_mgr):
+    """Correct metadata using MusicBrainz search."""
+    metadata_mgr.correct_metadata_interactive(path)
 
 
 if __name__ == '__main__':

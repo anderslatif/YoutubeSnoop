@@ -54,7 +54,7 @@ Each track will be named like this:
 {tracknumber}. {title}.flac
 ```
 
-It will try to infer the metadata from the playlist and set it in the downloaded files. Otherwise it will prompt you for it. It uses the [mutagen](https://mutagen.readthedocs.io/en/latest/) library to set the metadata and [beets](https://beets.io/) to fix any mistakes. It uses [musicbrainzngs](https://pypi.org/project/musicbrainzngs/) to download cover art as `Cover.jpg` or `Cover.png` and place it in the folder and added to the metadata of each track.
+It will try to infer the metadata from the playlist and set it in the downloaded files. Otherwise it will prompt you for it. It uses the [mutagen](https://mutagen.readthedocs.io/en/latest/) library to set the metadata with the help of [musicbrainz](https://musicbrainz.org/) to fix any mistakes. It uses [musicbrainzngs](https://pypi.org/project/musicbrainzngs/) to download cover art as `Cover.jpg` or `Cover.png` and place it in the folder and added to the metadata of each track.
 
 ### Videos
 

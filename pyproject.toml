@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "youtubesnoop"
-version = "0.1.3"
+version = "0.1.4"
 description = "YouTube video/music downloader with metadata tagging and cover art"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -12,7 +12,7 @@ license = {text = "MIT"}
 authors = [
     {name = "Anders"}
 ]
-keywords = ["youtube", "downloader", "music", "metadata", "flac", "beets"]
+keywords = ["youtube", "downloader", "music", "metadata", "flac", "musicbrainz"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: End Users/Desktop",
@@ -30,7 +30,6 @@ dependencies = [
     "yt-dlp>=2024.0.0",
     "mutagen>=1.47.0",
     "musicbrainzngs>=0.7.1",
-    "beets>=1.6.0",
     "questionary>=2.0.0",
     "click>=8.0.0",
     "requests>=2.31.0",
