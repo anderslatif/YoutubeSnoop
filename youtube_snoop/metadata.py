@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import Dict, Optional, List
 import questionary
+from questionary import Style
 from mutagen.flac import FLAC
 import musicbrainzngs
 import click
@@ -19,6 +20,15 @@ class MetadataManager:
             "0.1",
             "https://github.com/anderslatif/YoutubeSnoop"
         )
+        # Bright style for important selections
+        self.selection_style = Style([
+            ('qmark', 'fg:#ff00ff bold'),       # Bright magenta question mark
+            ('question', 'fg:#00ffff bold'),    # Bright cyan question
+            ('answer', 'fg:#00ff00 bold'),      # Bright green answer
+            ('pointer', 'fg:#ff00ff bold'),     # Bright magenta pointer
+            ('highlighted', 'fg:#ffff00 bold'), # Bright yellow highlight
+            ('selected', 'fg:#00ff00'),         # Green selected
+        ])
 
     def prompt_album_info(self, suggestions: Dict[str, str]) -> Dict[str, str]:
         """Prompt user for album-level metadata.
@@ -199,7 +209,8 @@ class MetadataManager:
 
                 selected = questionary.select(
                     "Select the correct release:",
-                    choices=[c[0] for c in choices]
+                    choices=[c[0] for c in choices],
+                    style=self.selection_style
                 ).ask()
 
                 if not selected or selected.startswith("Skip"):
@@ -247,7 +258,8 @@ class MetadataManager:
 
                 selected = questionary.select(
                     "Select the correct recording:",
-                    choices=[c[0] for c in choices]
+                    choices=[c[0] for c in choices],
+                    style=self.selection_style
                 ).ask()
 
                 if not selected or selected.startswith("Skip"):

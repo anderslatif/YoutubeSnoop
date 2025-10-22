@@ -61,4 +61,31 @@ It will try to infer the metadata from the playlist and set it in the downloaded
 It downloads as `flac` files per default but with the `--video` flag it will download the video as `mp4` instead.
 
 
+---
+
+## 403 Forbidden Errors
+
+Youtube constantly changes their API. The solution is likely to upgrade the `yt-dlp` dependency that this package uses under the hood.
+
+Run:
+
+```bash
+$ pip install --upgrade youtubesnoop
+```
+
+Or:
+
+```bash
+$ pipx upgrade yt-dlp
+```
+
+---
+
+## Windows Note
+
+It has been tested on Windows (Powershell) and MacOS. 
+
+For Powershell, remember to wrap the URL in quotes to avoid issues with special characters such as `&` being interpreted.
+
+On Windows, don't use Git Bash since `prompt_toolkit` has issues with it ANSI escape codes etc.
 
