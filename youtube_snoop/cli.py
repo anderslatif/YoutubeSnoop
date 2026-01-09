@@ -185,15 +185,20 @@ def process_playlist(info, downloader, metadata_mgr, parser, coverart_mgr, outpu
         if not downloader.video_mode:
             audio_files.append(final_path)
 
-    # Search and embed cover art for the album (audio only)
+    # Offer MusicBrainz metadata correction (audio only)
     if not downloader.video_mode and audio_files:
         click.echo()
-        coverart_mgr.process_album_cover(
-            album_dir,
-            album_metadata['artist'],
-            album_metadata['album'],
-            audio_files
-        )
+        metadata_corrected = metadata_mgr.correct_metadata_interactive(album_dir)
+
+        # Only search and embed cover art if metadata was corrected
+        if metadata_corrected:
+            click.echo()
+            coverart_mgr.process_album_cover(
+                album_dir,
+                album_metadata['artist'],
+                album_metadata['album'],
+                audio_files
+            )
 
     return album_dir
 
