@@ -46,8 +46,9 @@ def main(url, video):
 
     click.echo("✅ Download complete!")
 
-    # Offer MusicBrainz metadata correction on the downloaded file/folder only
-    if download_path and not video:
+    # Offer MusicBrainz metadata correction for single videos only
+    # (playlists already handle this in process_playlist)
+    if download_path and not video and not is_playlist:
         correct_metadata(download_path, metadata_mgr)
 
 

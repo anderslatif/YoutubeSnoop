@@ -1,4 +1,4 @@
-.PHONY: deploy
+.PHONY: publish
 
-deploy:
+publish:
 	uv build && uv publish
