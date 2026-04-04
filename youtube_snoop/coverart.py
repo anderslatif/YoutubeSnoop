@@ -1,5 +1,5 @@
 """Cover art search and download functionality using MusicBrainz."""
-
+from term_image.image import from_url
 import musicbrainzngs
 from pathlib import Path
 from typing import Optional, Dict
@@ -76,6 +76,9 @@ class CoverArtManager:
         try:
             response = requests.get(url, timeout=30)
             response.raise_for_status()
+
+            image = from_url(url)
+            image.draw()
 
             # Write image data
             output_path.write_bytes(response.content)

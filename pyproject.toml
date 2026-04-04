@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "youtubesnoop"
-version = "0.1.7"
+version = "0.1.8"
 description = "YouTube video/music downloader with metadata tagging and cover art"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -34,6 +34,7 @@ dependencies = [
     "click>=8.0.0",
     "requests>=2.31.0",
     "filetype>=1.2.0",
+    "term-image>=0.7.2",
 ]
 
 [project.scripts]
