@@ -1,12 +1,38 @@
 """CLI interface for YoutubeSnoop."""
 
+import shutil
+import sys
 import click
 from pathlib import Path
+from yt_dlp.utils import DownloadError
 from youtube_snoop.downloader import YouTubeDownloader
 from youtube_snoop.metadata import MetadataManager
 from youtube_snoop.parser import MetadataParser
 from youtube_snoop.coverart import CoverArtManager
 from youtube_snoop.utils import create_album_path, create_track_filename, sanitize_filename
+
+
+def is_youtube_forbidden_error(error: Exception) -> bool:
+    """Check whether an exception looks like YouTube's yt-dlp extraction breaking (HTTP 403)."""
+    return isinstance(error, DownloadError) and '403' in str(error)
+
+
+def print_upgrade_instructions():
+    """Tell the user how to upgrade yt-dlp, using whichever tool installed YoutubeSnoop."""
+    click.echo(
+        "\n💡 YouTube periodically changes its API, which breaks yt-dlp until it's updated.\n"
+        "   Try upgrading yt-dlp:",
+        err=True,
+    )
+    if shutil.which('pipx'):
+        click.echo("     pipx runpip youtubesnoop install --upgrade yt-dlp", err=True)
+    else:
+        click.echo(f"     {sys.executable} -m pip install --upgrade yt-dlp", err=True)
+    click.echo(
+        "   If the error persists, yt-dlp may not have a fix yet — check "
+        "https://github.com/yt-dlp/yt-dlp/issues for a known issue.",
+        err=True,
+    )
 
 
 @click.command()
@@ -40,6 +66,8 @@ def main(url, video):
 
     except Exception as e:
         click.echo(f"❌ Error: {e}", err=True)
+        if is_youtube_forbidden_error(e):
+            print_upgrade_instructions()
         raise
     finally:
         downloader.cleanup()
